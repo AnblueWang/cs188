@@ -87,17 +87,63 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    searched = [problem.getStartState()]
+    def dfsHelper(state):
+        successors = problem.getSuccessors(state)
+        if len(successors) == 0:
+            return False
+        for s in successors:
+            if s[0] in searched:
+                continue
+            searched.append(s[0])
+            if problem.isGoalState(s[0]):
+                return [s[1]]
+            else:
+                k = dfsHelper(s[0])
+                if k:
+                    k.insert(0,s[1])
+                    return k
+    return dfsHelper(problem.getStartState())
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
+    searched = [start]
+    task = util.Queue()
+    task.push([start,[]])
+    while not task.isEmpty():
+        s = task.pop()
+        for x in problem.getSuccessors(s[0]):
+            if x[0] in searched:
+                continue
+            searched.append(x[0])
+            tmp = s[1][:]
+            tmp.append(x[1])
+            task.push([x[0],tmp])
+            if problem.isGoalState(x[0]):
+                return tmp
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
+    searched = [start]
+    pg = util.PriorityQueue()
+    pg.push([start,[],0],0)
+    while not pg.isEmpty():
+        s = pg.pop()
+        for x in problem.getSuccessors(s[0]):
+            if x[0] in searched:
+                continue
+            searched.append(x[0])
+            tmp = s[1][:]
+            tmp.append(x[1])
+            pg.push([x[0],tmp,s[2]+x[2]],s[2]+x[2])
+            if problem.isGoalState(x[0]):
+                return tmp
+
 
 def nullHeuristic(state, problem=None):
     """
@@ -109,7 +155,21 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
+    searched = [start]
+    pg = util.PriorityQueue()
+    pg.push([start,[],0],heuristic(start,problem))
+    while not pg.isEmpty():
+        s = pg.pop()
+        for x in problem.getSuccessors(s[0]):
+            if x[0] in searched:
+                continue
+            searched.append(x[0])
+            tmp = s[1][:]
+            tmp.append(x[1])
+            pg.push([x[0],tmp,s[2]+x[2]],s[2]+heuristic(x[0],problem))
+            if problem.isGoalState(x[0]):
+                return tmp
 
 
 # Abbreviations
